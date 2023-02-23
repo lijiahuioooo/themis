@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package com.mfw.themis.collector.server;
+
+// The service definition.
+service CollectorService {
+
+    // Sends message
+    rpc reportMessage (stream MfwCollectorReq) returns (MfwCollectorRes) {
+    }
+
+}
+
+message MfwCollectorReq{
+     string appCode=1;
+     string metric=2;
+     int64 timestamp=3;
+     map<string, string> data=4;
+}
+message MfwCollectorRes{
+     string errorCode =1;
+     string errorMessage=2;
+     MfwCollectorResData data=3;
+}
+
+message MfwCollectorResData{
+     string sendStatus=1;
+     string collectorId=2;
+     map<string, string> data=3;
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mfw.themis.dao.mapper.AppDao" >
+
+  <resultMap id="BaseResultMap" type="com.mfw.themis.dao.po.AppPO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="app_code" property="appCode" jdbcType="VARCHAR" />
+    <result column="app_name" property="appName" jdbcType="VARCHAR" />
+    <result column="project_type" property="projectType" jdbcType="INTEGER" />
+    <result column="department" property="department" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+    <result column="grafana_uid" property="grafanaUid" jdbcType="VARCHAR" />
+    <result column="creater" property="creater" jdbcType="BIGINT" />
+    <result column="operator" property="operator" jdbcType="BIGINT" />
+    <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
+    <result column="ctime" property="ctime" jdbcType="TIMESTAMP" />
+    <result column="mtime" property="mtime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    *
+  </sql>
+
+  <select id="selectAppPage" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from t_app
+    <where>
+      <if test="param.id != null">
+        and id = #{param.id}
+      </if>
+      <if test="param.appName != null">
+        and (app_code like "%"#{param.appName}"%" or app_name like "%"#{param.appName}"%")
+      </if>
+      <if test="param.isDelete != null">
+        and is_delete = #{param.isDelete}
+      </if>
+    </where>
+    order by id desc
+  </select>
+
+</mapper>

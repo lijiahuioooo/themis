@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mfw.themis.dao.mapper.AppMetricDao" >
+
+  <resultMap id="BaseResultMapDetail" type="com.mfw.themis.dao.po.union.AppMetricUnionPO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+
+    <id column="app_id" property="appId" jdbcType="BIGINT" />
+    <result column="metric_id" property="metricId" jdbcType="BIGINT" />
+    <result column="datasource_id" property="datasourceId" jdbcType="BIGINT" />
+    <result column="collect_id" property="collectId" jdbcType="INTEGER" />
+    <result column="attr_value" property="attrValue" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
+    <result column="app_code" property="appCode" jdbcType="VARCHAR" />
+    <result column="app_name" property="appName" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="expression" property="expression" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="time_window" property="timeWindow" jdbcType="INTEGER" />
+    <result column="time_window_type" property="timeWindowType" jdbcType="INTEGER" />
+    <result column="time_window_offset" property="timeWindowOffset" jdbcType="VARCHAR" />
+    <result column="custom_time_window" property="customTimeWindow" jdbcType="VARCHAR" />
+    <result column="source_type" property="sourceType" jdbcType="INTEGER" />
+    <result column="metric_type" property="metricType" jdbcType="INTEGER" />
+    <result column="collect_type" property="collectType" jdbcType="INTEGER" />
+    <result column="group_type" property="groupType" jdbcType="INTEGER" />
+    <result column="group_field" property="groupField" jdbcType="VARCHAR" />
+    <result column="metric_unit" property="metricUnit" jdbcType="INTEGER" />
+    <result column="metric_tag" property="metricTag" jdbcType="VARCHAR" />
+    <result column="composite_metric_expression" property="compositeMetricExpression" jdbcType="VARCHAR" />
+    <result column="formula" property="formula" jdbcType="VARCHAR" />
+    <result column="ext_data" property="extData" jdbcType="VARCHAR" />
+    <result column="datasource_name" property="datasourceName" jdbcType="VARCHAR"/>
+    <result column="datasource_type" property="datasourceType" jdbcType="INTEGER"/>
+    <result column="ctime" property="ctime" jdbcType="TIMESTAMP" />
+    <result column="mtime" property="mtime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_Detail_List" >
+    ap.id as id,m.id as metric_id,a.id as app_id,d.id as datasource_id,
+    ap.attr_value,ap.collect_id,ap.status,ap.is_delete,
+    a.app_code,a.app_name,
+    m.name,m.expression,m.description,
+    m.time_window,m.time_window_type,m.time_window_offset,m.custom_time_window,
+    m.source_type,m.metric_type,m.collect_type,m.group_type,m.group_field,m.metric_unit,
+    m.metric_tag,m.composite_metric_expression,m.formula,m.ext_data,
+    d.name as datasource_name,d.type as datasource_type,
+    ap.creater,ap.ctime,ap.mtime
+  </sql>
+
+  <select id="selectAppMetricPageByParam" resultMap="BaseResultMapDetail" >
+    select
+    <include refid="Base_Column_Detail_List" />
+    from t_app_metric as ap
+    inner join t_app a on a.id = ap.app_id
+    inner join t_alarm_metric m on m.id = ap.metric_id
+    inner join t_datasource d on d.id = ap.datasource_id
+    <where>
+      ap.is_delete = 0 and a.is_delete = 0 and m.is_delete = 0 and d.is_delete = 0
+      <if test="param.appMetricId != null">
+        and ap.id = #{param.appMetricId}
+      </if>
+      <if test="param.appMetricIds != null">
+        and ap.id in
+        <foreach collection="param.appMetricIds" item="appMetricId" open="(" separator="," close=")">
+          #{appMetricId}
+        </foreach>
+      </if>
+      <if test="param.appCode != null">
+        and a.app_code = #{param.appCode}
+      </if>
+      <if test="param.appId != null">
+        and ap.app_id = #{param.appId}
+      </if>
+      <if test="param.name != null">
+        and m.name like "%"#{param.name}"%"
+      </if>
+      <if test="param.metricId != null">
+        and ap.metric_id = #{param.metricId}
+      </if>
+      <if test="param.metricType != null">
+        and m.metric_type = #{param.metricType}
+      </if>
+      <if test="param.collectType != null">
+        and m.collect_type = #{param.collectType}
+      </if>
+      <if test="param.datasourceId != null">
+        and ap.datasource_id = #{param.datasourceId}
+      </if>
+      <if test="param.datasourceType != null">
+        and d.type = #{param.datasourceType}
+      </if>
+      <if test="param.isDelete != null">
+        and ap.is_delete = #{param.isDelete}
+      </if>
+    </where>
+    order by ap.id desc
+  </select>
+
+  <select id="selectAppMetricSuggestPageByParam" resultMap="BaseResultMapDetail" >
+    select
+    <include refid="Base_Column_Detail_List" />
+    from t_app_metric as ap
+    inner join t_app a on a.id = ap.app_id
+    inner join t_alarm_metric m on m.id = ap.metric_id
+    inner join t_datasource d on d.id = ap.datasource_id
+    <where>
+      ap.is_delete = 0 and a.is_delete = 0 and m.is_delete = 0 and d.is_delete = 0
+      <if test="param.appMetricId != null">
+        and ap.id = #{param.appMetricId}
+      </if>
+      <if test="param.appCode != null">
+        and a.app_code = #{param.appCode}
+      </if>
+      <if test="param.name != null">
+        and m.name like "%"#{param.name}"%"
+      </if>
+      <if test="param.metricType != null">
+        and m.metric_type = #{param.metricType}
+      </if>
+      <if test="param.collectType != null">
+        and m.collect_type = #{param.collectType}
+      </if>
+      <if test="param.datasourceType != null">
+        and d.type = #{param.datasourceType}
+      </if>
+      <if test="param.isDelete != null">
+        and ap.is_delete = #{param.isDelete}
+      </if>
+    </where>
+    order by ap.id desc
+  </select>
+
+</mapper>
